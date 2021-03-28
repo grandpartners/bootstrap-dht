@@ -48,7 +48,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <cinttypes> // for PRId64
 #include <array>
 
-#include <boost/uuid/sha1.hpp>
+#include <boost/uuid/detail/sha1.hpp>
 #include <boost/crc.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/circular_buffer.hpp>
@@ -177,11 +177,12 @@ void print_stats(steady_timer& stats_timer, error_code const& ec)
 		}
 		client_histogram.clear();
 	}
-	std::sort(ordered.begin(), ordered.end());
-	char client_dist[200];
+	std::sort(ordered.begin(), ordered.end(), std::greater<>{});
+	char client_dist[250];
 	client_dist[0] = '\0';
 	int len = 0;
 	for (auto i : ordered) {
+        if (len > sizeof(client_dist) - 10) break;
 		len += snprintf(client_dist + len, sizeof(client_dist) - len
 			, "[%c%c: %d] ", (i.second >> 8) & 0xff, i.second & 0xff, i.first);
 	}
@@ -1456,4 +1457,3 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
-
